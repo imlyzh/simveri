@@ -1,0 +1,121 @@
+
+
+
+
+expr = { expr_relational ~ (logical_op ~ expr_relational)* }
+
+logical_op = { "&&" | "||" }
+
+relational_op = { "<=" | "<" | ">=" | ">" | "==" | "!=" }
+
+level1_op = { "+" | "-" }
+
+level2_op = {  }
+
+level3_op = { "*" | "/" | "%" }
+
+expr_relational = { expr_binary_level1 ~ (relational_op ~ expr_binary_level1)* }
+
+expr_binary_level1 = { expr_binary_level2 ~ (level1_op ~ expr_binary_level2)* }
+
+expr_binary_level2 = { expr_binary_level3 ~ (level2_op ~ expr_binary_level3)* }
+
+expr_binary_level3 = { expr_unary ~ (level3_op ~ expr_unary)? }
+
+expr_unary =
+    { unary_op ~ expr_unary
+    | primary
+    }
+
+unary_op =
+    { "!"
+    | "~"
+    | "&"
+    | "~&"
+    | "|"
+    | "~|"
+    | "^"
+    | "~^"
+    | "-"
+    | "+"
+    }
+
+primary =
+    { split
+    | index
+    | multiple_concatenation
+    | concatenation
+    | "(" ~ expr ~ ")"
+    | id
+    | number
+    }
+
+split = {
+    id ~ "[" ~ expr ~ ":" ~ expr ~ "]"
+}
+
+index = {
+    id ~ "[" ~ expr ~ "]"
+}
+
+concatenation = {
+    "{" ~ expr ~ ("," ~ expr)* ~ "}"
+}
+
+multiple_concatenation = {
+    "{" ~ expr ~ concatenation ~ "}"
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+
+id = $ { (ASCII_ALPHA_LOWER | UNDERLINE) ~ (ASCII_ALPHANUMERIC | UNDERLINE)* }
+
+number = $
+    { number_hex
+    | number_oct
+    | number_bin
+    | number_dec
+    }
+
+number_dec = _ {
+//     ("+" | "-")? ~
+    dec_prefix? ~ ASCII_DIGIT+
+    }
+
+dec_prefix = {
+    SIZE ~ ("'d"|"'D")
+}
+
+number_oct = _ {
+//     ("+" | "-")? ~
+    SIZE ~ ("'o"|"'O") ~ ASCII_OCT_DIGIT+
+    }
+
+number_hex = _ {
+//     ("+" | "-")? ~
+    SIZE ~ ("'h"|"'H") ~ ASCII_HEX_DIGIT+
+    }
+
+number_bin = _ {
+//     ("+" | "-")? ~
+    SIZE ~ ("'b"|"'B") ~ ASCII_BIN_DIGIT+
+    }
+
+SIZE = {
+    NUM?
+}
+
+NUM = {
+    ASCII_DIGIT+
+}
+
+UNDERLINE = _ { "_" }
+
+WHITESPACE = _ { " "
+               | "\t"
+               | WHITE_SPACE
+               | NEWLINE
+               }
+
+// COMMENT = _ { "//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE? }
