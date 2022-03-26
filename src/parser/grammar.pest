@@ -1,18 +1,19 @@
 
-
-
-
-expr = { expr_relational ~ (logical_op ~ expr_relational)* }
+expr = { expr_binary_level0 ~ (logical_op ~ expr_binary_level0)* }
 
 logical_op = { "&&" | "||" }
 
-relational_op = { "<=" | "<" | ">=" | ">" | "==" | "!=" }
+level0_op = { "&" | "|" | "^~" | "^" }
 
-level1_op = { "+" | "-" }
+relational_op = { "<=" | "<" | ">=" | ">" | "==" | "!=" | "===" | "!==" }
 
-level2_op = {  }
+level1_op = { "<<" | ">>" | "<<<" | ">>>" }
+
+level2_op = { "+" | "-" }
 
 level3_op = { "*" | "/" | "%" }
+
+expr_binary_level0 = { expr_relational ~ (level0_op ~ expr_relational)* }
 
 expr_relational = { expr_binary_level1 ~ (relational_op ~ expr_binary_level1)* }
 
